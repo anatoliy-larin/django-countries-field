@@ -3,7 +3,7 @@ import gettext
 from django.conf import settings
 from django.forms import MultipleChoiceField
 import pycountry
-from tools.countries_field.fields import countries
+from countries_field.fields import countries
 
 
 class CountriesFormField(MultipleChoiceField):

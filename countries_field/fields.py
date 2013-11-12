@@ -1,9 +1,8 @@
 # coding: utf-8
-
-from bitfield.models import BitField, MAX_FLAG_COUNT
-
 from django.db import models
 from django.db.models.fields.subclassing import Creator
+
+from bitfield.models import BitField, MAX_FLAG_COUNT
 import pycountry
 
 
@@ -30,6 +29,7 @@ def bin_to_countries(binaries):
     список стран.
     :param binaries: Список из 4 элементов шириной MAX_FLAG_COUNT каждый
     :return: Список 2-х буквенных кодов стран
+
     """
     countries = []
     for byte_num in xrange(4):
@@ -47,7 +47,6 @@ def bin_to_countries(binaries):
 class CountriesValue(object):
     """ Представление набора заданых стран.
     """
-
     def __init__(self, binaries=None, countries=None):
         self.binaries = [int(b) & VALID_BINARY_MASK
                          for b in (binaries or [0, 0, 0, 0])]
@@ -77,6 +76,7 @@ class CountriesValue(object):
         """ Объединяет списки стран.
         :param other: список 2-х буквенных кодов стран
         :return: CountriesValues
+
         """
         if isinstance(other, (list, tuple)):
             other = countries_to_bin(other)
@@ -89,6 +89,7 @@ class CountriesValue(object):
         """ Удаляет из текущего значение переданный список стран.
         :param other список 2-х буквенных кодов стран:
         :return:
+
         """
         if isinstance(other, (list, tuple)):
             other = countries_to_bin(other)
@@ -101,6 +102,7 @@ class CountriesValue(object):
         """ Проверяет вхождение страны в список.
         :param item: 2-х символьный код страны для проверки
         :return: True/False
+
         """
         binaries = countries_to_bin([item])
         for i in xrange(4):
@@ -112,7 +114,6 @@ class CountriesValue(object):
 class CountriesFieldDescriptor(Creator):
     """ Управляет доступом к значениям битовых полей.
     """
-
     def __get__(self, obj, objtype=None):
         if obj is None:
             raise AttributeError('Can only be accessed via an instance.')
@@ -132,10 +133,10 @@ class CountriesFieldDescriptor(Creator):
 class CountriesField(models.Field):
     """ Класс поля для хранения битовой карты стран.
     """
-
     def contribute_to_class(self, cls, name):
         """ Создаёт битовые поля, регистрирует себя как виртуальное поле,
         регистриует дескриптор.
+
         """
         self.name = name
         self.cls = cls
@@ -157,10 +158,9 @@ class CountriesField(models.Field):
                                         weak=False)
 
     def instance_pre_init(self, signal, sender, args, kwargs, **opts):
-        """ Обработка создания объекта модели. """
+        """ Обработка создания объекта модели.
+        """
         if self.name in kwargs:
             countries = kwargs.pop(self.name)
             binaries = countries_to_bin(countries)
             kwargs.update(dict(zip(self.bit_field_names, binaries)))
-
-
